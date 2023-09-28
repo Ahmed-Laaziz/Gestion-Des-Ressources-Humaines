@@ -2,7 +2,7 @@ version: "3"
 services:
   node-app:
     build:
-      context: .
+      context: ./api
       target: production
     environment:
       - NOD_ENV=production
