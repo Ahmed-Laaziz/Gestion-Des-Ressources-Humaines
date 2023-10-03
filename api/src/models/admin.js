@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 
 const adminSchema = new Schema({
         
-        role: {
+        fonction: {
             type: String,
-            default: 'admin'
+            required: true
         },
     }
 )

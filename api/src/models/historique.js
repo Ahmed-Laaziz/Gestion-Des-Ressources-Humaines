@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const gradeHistoriqueSchema = new mongoose.Schema({
   professeur: { type: mongoose.Schema.Types.ObjectId, ref: 'Professeur' },
   grade: String,
-  annee: Number,
+  classe: String,
+  date: Date,
 });
 
 const Historique = mongoose.model('GradeHistorique', gradeHistoriqueSchema);

@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const Professeur = require('./models/professeur');
 const Admin = require('./models/admin');
@@ -10,15 +11,31 @@ const app = express();
 
 // Body-parser middleware to parse JSON requests
 app.use(bodyParser.json());
-
+app.use(cors());
 const DB_USER = 'root';
 const DB_PASSWORD = 'example';
 const DB_PORT = 27017
 const DB_HOST = 'mongo'
-const URI = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}`
+//Docker
+// const URI = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}`
+//Local
+const URI = "mongodb+srv://ahmed:ahmed123@cluster0.i5myq.mongodb.net/?retryWrites=true&w=majority"
+
 mongoose.connect(URI).then(() => console.log('connect to db...')).catch(err => console.log('failed to connect to db : ', err));
 
 app.get('/', (req, res) => res.send('<h1>Hello World!!</h1>'));
+
+
+// Add a route to retrieve and display a list of Professeurs
+app.get('/admins', async (req, res) => {
+  try {
+    const allAdmins = await Admin.find({});
+    res.json(allAdmins);
+  } catch (error) {
+    console.error('Error retrieving admin:', error);
+    res.status(500).json({ error: 'Failed to retrieve admin' });
+  }
+});
 
 app.post('/add-professeur', async (req, res) => {
     try {
@@ -45,6 +62,11 @@ app.post('/add-professeur', async (req, res) => {
         nom: req.body.nom, 
         prenom: req.body.prenom, 
         email: req.body.email, 
+        password: req.body.password,
+        tel: req.body.tel,
+        cin: req.body.cin,
+        genre: req.body.genre,
+        fonction: req.body.fonction,
       });
   
       const savedAdmin = await newAdmin.save();
@@ -86,4 +108,4 @@ app.get('/professeurs', async (req, res) => {
     }
   });
   
-app.listen(PORT, ()=> console.log(`app is un and running on port : ${PORT}`));
+app.listen(PORT, ()=> console.log(`app is up and running on port : ${PORT}`));
