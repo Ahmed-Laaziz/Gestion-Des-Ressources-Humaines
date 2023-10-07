@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,6 +14,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import EnsaImg from '../images/ensaj.jpg';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useToken } from '../auth/TokenContext';
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -28,17 +32,67 @@ function Copyright(props) {
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
+
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
-  const handleSubmit = (event) => {
+  const navigate = useNavigate();
+  const { setToken } = useToken();
+  const [emailError, setEmailError] = useState('');
+const [passwordError, setPasswordError] = useState('');
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const email = data.get('email');
+    const password = data.get('password');
+
+    // Reset previous error messages
+  setEmailError('');
+  setPasswordError('');
+
+  if (!email) {
+    // Display an error message if email or password is empty
+    setEmailError('Email is required');
+    
+    // return;
+  }
+  if (!password) {
+    // Display an error message if email or password is empty
+    setPasswordError('Password is required');
+    // return;
+  }
+  
+    try {
+      // Send a POST request to the /login endpoint with user credentials
+      const response = await axios.post('http://localhost:4000/login', { email, password });
+  
+      // If authentication is successful, you will receive a JWT token in the response
+      const token = response.data.token;
+  
+      // You can store the token in a cookie or local storage for future authenticated requests
+      // For this example, we'll just log the token
+      console.log('JWT Token:', token);
+      setToken(token);
+      // Save the token in localStorage
+    localStorage.setItem('token', token);
+      navigate(`/home`);
+      // Redirect the user or perform any necessary actions upon successful login
+    } catch (error) {
+      if (error.response.status === 401 && password !== ''){
+        setPasswordError('Incorrect password');
+      }
+      else if (error.response.status === 404 && email !== ''){
+        setEmailError('Incorrect Email');
+      }
+      // Handle authentication errors
+      if (error.response) {
+        console.error('Authentication failed:', error.response.data.error);
+      } else {
+        console.error('An error occurred during authentication:', error.message);
+      }
+    }
   };
+  
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -75,26 +129,30 @@ export default function SignInSide() {
               Sign in
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
+            <TextField
+  margin="normal"
+  required
+  fullWidth
+  id="email"
+  label="Email Address"
+  name="email"
+  autoComplete="email"
+  autoFocus
+/>
+<span style={{ color: 'red' , fontSize: '70%'}}>{emailError}</span>
+
+<TextField
+  margin="normal"
+  required
+  fullWidth
+  name="password"
+  label="Password"
+  type="password"
+  id="password"
+  autoComplete="current-password"
+/>
+<span style={{ color: 'red' , fontSize: '70%'}}>{passwordError}</span>
+
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"

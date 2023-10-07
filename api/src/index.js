@@ -4,7 +4,15 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const Professeur = require('./models/professeur');
 const Admin = require('./models/admin');
+const Agent = require('./models/agent');
 const Historique = require('./models/historique');
+const generateRandomPassword = require('./business/passwordGenerator');
+const sendEmail = require('./business/emailSender'); // Import the sendEmail function
+const jwt = require('jsonwebtoken'); // For generating JWT tokens
+const bcrypt = require('bcrypt'); // For password hashing
+const crypto = require('crypto');
+require('dotenv').config(); // Load environment variables from .env file
+
 //init app
 const PORT = 4000;
 const app = express();
@@ -12,6 +20,7 @@ const app = express();
 // Body-parser middleware to parse JSON requests
 app.use(bodyParser.json());
 app.use(cors());
+
 const DB_USER = 'root';
 const DB_PASSWORD = 'example';
 const DB_PORT = 27017
@@ -25,7 +34,57 @@ mongoose.connect(URI).then(() => console.log('connect to db...')).catch(err => c
 
 app.get('/', (req, res) => res.send('<h1>Hello World!!</h1>'));
 
+// Route for user login
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
 
+  try {
+    // Find the user by email in the Agent collection (which includes Admin and Professeur)
+    const user = await Agent.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Compare the provided password with the hashed password in the database
+    // const passwordMatch = await bcrypt.compare(password, password);
+
+    if (password != user.password) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+
+    // If email and password are valid, generate a JWT token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '1h', // Token expiration time
+    });
+
+    // Send the token as a response
+    res.json({ token });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'An error occurred during login' });
+  }
+});
+
+// Define a route to get agent data by ID
+app.get('/agents/:id', async (req, res) => {
+  try {
+    const agentId = req.params.id;
+
+    // Find the agent by ID in your Agent collection
+    const agent = await Agent.findById(agentId);
+
+    if (!agent) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    // Return the agent data as JSON
+    res.json(agent);
+  } catch (error) {
+    console.error('Error fetching agent by ID:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 // Add a route to retrieve and display a list of Professeurs
 app.get('/admins', async (req, res) => {
   try {
@@ -39,15 +98,32 @@ app.get('/admins', async (req, res) => {
 
 app.post('/add-professeur', async (req, res) => {
     try {
+      const randomPassword = generateRandomPassword(8);
+
       const newProfesseur = new Professeur({
-        nom: 'John', 
-        prenom: 'Doe', 
-        email: 'johndoe@example.com', 
-        departement: 'Mathematics', 
+        nom: req.body.nom, 
+        prenom: req.body.prenom, 
+        email: req.body.email, 
+        password: randomPassword,
+        tel: req.body.tel,
+        cin: req.body.cin,
+        genre: req.body.genre,
+        num_loyer: req.body.num_loyer,
+        date_entre_ecole: req.body.date_entre_ecole,
+        date_fct_publique:req.body.date_fct_publique,
+        cadre:req.body.cadre,
+        num_ref:req.body.num_ref,
+        date_effective:req.body.date_effective,
+        anciennete:req.body.anciennete,
+        date_visa:req.body.date_visa
       });
   
       const savedProfesseur = await newProfesseur.save();
-  
+      // Send an email to the added professor with their login information
+    const emailSubject = 'Welcome to Our Platform';
+    const emailText = `Dear Professor,\n\nYou have been added to our platform. Your login email is: ${req.body.email}\nYour password is: ${randomPassword}\n\nPlease use these credentials to log in.\n\nBest regards,\nYour Platform Team`;
+
+    sendEmail(req.body.email, emailSubject, emailText);
       res.json(savedProfesseur);
     } catch (error) {
       console.error('Error adding professeur:', error);

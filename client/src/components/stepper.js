@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -7,12 +8,30 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Modal from '@mui/material/Modal';
 import InputAdornment from '@mui/material/InputAdornment';
 import Autocomplete from '@mui/material/Autocomplete';
-
-const steps = ['Select campaign settings', 'Create an ad group', 'Create an ad'];
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import axios from 'axios';
+const steps = ['données personnelles', 'données professionnelles', 'données supplémentaires'];
 const cadreOptions = ['professeur', 'ingénieur'];
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 export default function HorizontalNonLinearStepper() {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
 
@@ -53,13 +72,253 @@ export default function HorizontalNonLinearStepper() {
     newCompleted[activeStep] = true;
     setCompleted(newCompleted);
     handleNext();
+    if (completedSteps() === totalSteps()){
+      setOpen(true);
+      addProfesseur();
+    }
   };
+  const handleCancelModal = () => {
+    console.log("cancel clicked");
+    setOpen(!open);
+  }
 
   const handleReset = () => {
     setActiveStep(0);
     setCompleted({});
   };
 
+
+  //Email
+  const [email, setEmail] = React.useState('');
+  const [emailError, setEmailError] = React.useState(false);
+  const [emailHelperText, setEmailHelperText] = React.useState('');
+
+  const handleEmailChange = (e) => {
+    const newValue = e.target.value;
+    setEmail(newValue);
+
+    // Validate the email address
+    if (newValue === ""){
+      setEmailError(false);
+      setEmailHelperText('');
+    }
+    else if (!validateEmail(newValue)) {
+      setEmailError(true);
+      setEmailHelperText('Invalid email address. Please enter a valid email.');
+    } else {
+      setEmailError(false);
+      setEmailHelperText('');
+    }
+  };
+  const validateEmail = (email) => {
+    // A simple regex pattern to validate email addresses
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+//Phone number
+const [phoneNumber, setPhoneNumber] = React.useState('');
+  const [phoneNumberError, setPhoneNumberError] = React.useState(false);
+  const [phoneNumberHelperText, setPhoneNumberHelperText] = React.useState('');
+
+  const handleChange = (e) => {
+    const newValue = e.target.value;
+    setPhoneNumber(newValue);
+
+    // Validate the phone number
+    if (newValue === ""){
+      setPhoneNumberError(false);
+      setPhoneNumberHelperText('');
+    }
+    else if (!validatePhoneNumber(newValue)) {
+      setPhoneNumberError(true);
+      setPhoneNumberHelperText('Invalid phone number. It must be 9 numeric characters.');
+    } else {
+      setPhoneNumberError(false);
+      setPhoneNumberHelperText('');
+    }
+  };
+
+  const validatePhoneNumber = (phoneNumber) => {
+    const phoneRegex = /^\d{9}$/;
+    return phoneRegex.test(phoneNumber);
+  };
+  
+  //CIN
+  const [cin, setCin] = React.useState('');
+  const [cinError, setCinError] = React.useState(false);
+  const [cinHelperText, setCinHelperText] = React.useState('');
+
+  const handleCINChange = (e) => {
+    const newValue = e.target.value;
+    setCin(newValue);
+    console.log(newValue === "");
+
+    // Validate the CIN format
+    if (newValue === ""){
+      setCinError(false);
+      setCinHelperText('');
+    }
+    else if (!validateCin(newValue)) {
+      setCinError(true);
+      setCinHelperText('Invalid CIN format. Please enter a valid CIN (e.g., AB123456).');
+    }
+     
+     else {
+      setCinError(false);
+      setCinHelperText('');
+    }
+  };
+
+  const validateCin = (cin) => {
+    // A simple regex pattern to validate CIN format: two capital letters followed by six numbers
+    const cinRegex = /^[A-Z]{2}\d{6}$/;
+    return cinRegex.test(cin);
+  };
+
+  //name 
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [firstNameError, setFirstNameError] = React.useState(false);
+  const [lastNameError, setLastNameError] = React.useState(false);
+  const [firstNameHelperText, setFirstNameHelperText] = React.useState('');
+  const [lastNameHelperText, setLastNameHelperText] = React.useState('');
+
+  const handleChangeFirstName = (e) => {
+    const newValue = e.target.value;
+    setFirstName(newValue);
+
+    // Validate the first name
+    if (!validateName(newValue)) {
+      setFirstNameError(true);
+      setFirstNameHelperText('Invalid first name format. Please enter a valid first name.');
+    } else {
+      setFirstNameError(false);
+      setFirstNameHelperText('');
+    }
+  };
+
+  const handleChangeLastName = (e) => {
+    const newValue = e.target.value;
+    setLastName(newValue);
+
+    // Validate the last name
+    if (!validateName(newValue)) {
+      setLastNameError(true);
+      setLastNameHelperText('Invalid last name format. Please enter a valid last name.');
+    } else {
+      setLastNameError(false);
+      setLastNameHelperText('');
+    }
+  };
+
+  const validateName = (name) => {
+    // A simple regex pattern to validate names (alphabetic characters only)
+    const nameRegex = /^[A-Za-z\s]*$/;
+    return nameRegex.test(name);
+  };
+  
+
+  
+
+  const [loyerValue, setLoyerValue] = useState('');
+  const [preuveValue, setPreuveValue] = useState('');
+  const handleInputChange = (event) => {
+    const inputValue = event.target.value;
+    // Remove any non-numeric characters using a regular expression
+    const numericValue = inputValue.replace(/[^0-9]/g, '');
+    setLoyerValue(numericValue);
+  };
+  const handlePreuveInputChange = (event) => {
+    const inputValue = event.target.value;
+    // Remove any non-numeric characters using a regular expression
+    const numericValue = inputValue.replace(/[^0-9]/g, '');
+    setPreuveValue(numericValue);
+  };
+
+  //Cadre
+  const [selectedCadre, setSelectedCadre] = useState(null);
+
+  const handleCadreChange = (event, newValue) => {
+    setSelectedCadre(newValue);
+  };
+
+  //Classe
+  const [selectedClasse, setSelectedClasse] = useState(null);
+
+  const handleClasseChange = (event, newValue) => {
+    setSelectedClasse(newValue);
+  };
+
+  //Grade
+  const [selectedGrade, setSelectedGrade] = useState(null);
+
+  const handleGradeChange = (event, newValue) => {
+    setSelectedGrade(newValue);
+  };
+
+  //Date fonction
+  const [selectedDateFct, setSelectedDateFct] = useState(null);
+
+  // Function to handle date selection
+  const handleDateFctChange = (date) => {
+    setSelectedDateFct(date);
+  };
+
+  //Date etablissement
+  const [selectedDateSchool, setSelectedDateSchool] = useState(null);
+
+  const handleDateSchoolChange = (date) => {
+    setSelectedDateSchool(date);
+  };
+
+  //Date visa
+  const [selectedDateVisa, setSelectedDateVisa] = useState(null);
+
+  const handleDateVisaChange = (date) => {
+    setSelectedDateVisa(date);
+  };
+  //Date effective
+  const [selectedDateEffective, setSelectedDateEffective] = useState(null);
+
+  const handleDateEffectiveChange = (date) => {
+    setSelectedDateEffective(date);
+  };
+
+
+
+  const addProfesseur = async () => {
+    try {
+      // Show the spinner while the backend request is in progress
+      // setIsLoading(true);
+      const url = "http://localhost:4000/add-professeur"; // URL for the backend API
+      const requestData = {
+        nom: lastName, // Send the user input as a parameter in the request body
+        prenom: lastName,
+        email: email,
+        tel: phoneNumber,
+        cin: cin,
+        genre: "Male",
+        num_loyer: loyerValue,
+        date_entre_ecole: selectedDateSchool,
+        date_fct_publique:selectedDateFct,
+        cadre:selectedCadre,
+        num_ref:2121,
+        date_effective:selectedDateEffective,
+        anciennete:"2 ans",
+        date_visa:selectedDateVisa
+      };
+
+      // Make a POST request to your backend API
+      const response = await axios.post(url, requestData);
+      
+    } catch (error) {
+      console.error("Error fetching abstract:", error);
+    } finally {
+      // Hide the spinner after the backend request is completed
+      // setIsLoading(false);
+    }
+  };
   return (
     <Box sx={{ width: '100%' }}>
       <Stepper nonLinear activeStep={activeStep}>
@@ -80,11 +339,13 @@ export default function HorizontalNonLinearStepper() {
                   Prénom (الإسم)
                 </Typography>
                 <TextField
-                //   label="French Label 1"
                   variant="outlined"
                   fullWidth
-                  // Add necessary props and event handlers
-                />
+                  value={firstName}
+                  onChange={handleChangeFirstName}
+                  error={firstNameError}
+                  helperText={firstNameHelperText}
+          />
               </div>
             </Grid>
             <Grid item xs={4}>
@@ -93,11 +354,13 @@ export default function HorizontalNonLinearStepper() {
                   Nom (النسب)
                 </Typography>
                 <TextField
-                  
                   variant="outlined"
                   fullWidth
-                  // Add necessary props and event handlers
-                />
+                  value={lastName}
+                  onChange={handleChangeLastName}
+                  error={lastNameError}
+                  helperText={lastNameHelperText}
+          />
               </div>
             </Grid>
             <Grid item xs={4}>
@@ -109,6 +372,10 @@ export default function HorizontalNonLinearStepper() {
                 //   label="French Label 3"
                   variant="outlined"
                   fullWidth
+                  value={cin}
+                  onChange={handleCINChange}
+                  error={cinError}
+                  helperText={cinHelperText}
                   // Add necessary props and event handlers
                 />
               </div>
@@ -119,36 +386,105 @@ export default function HorizontalNonLinearStepper() {
                   Email (البريد الإلكتروني)
                 </Typography>
                 <TextField
-                //   label="French Label 3"
-                  variant="outlined"
-                  fullWidth
-                  // Add necessary props and event handlers
-                />
+                variant="outlined"
+                fullWidth
+                value={email}
+                onChange={handleEmailChange}
+                error={emailError}
+                helperText={emailHelperText}
+        />
+              </div>
+            </Grid>
+            <Grid item xs={6}>
+      <div>
+        <Typography variant="subtitle1" gutterBottom>
+          Numéro de téléphone (رقم الهاتف)
+        </Typography>
+        <TextField
+          variant="outlined"
+          fullWidth
+          value={phoneNumber}
+          onChange={handleChange}
+          error={phoneNumberError}
+          helperText={phoneNumberHelperText}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">+212</InputAdornment>
+            ),
+          }}
+        />
+      </div>
+    </Grid>
+            
+          </Grid>
+        )}
+
+{activeStep === 2 && (
+          <Grid container spacing={2} style={{marginTop:"2%"}}>
+            <Grid item xs={6} >
+            <div>
+                <Typography variant="subtitle1" gutterBottom>
+                  
+                Numéro de loyer (رقم التأجير)
+                </Typography>
+                <TextField
+      variant="outlined"
+      fullWidth
+      value={loyerValue}
+      onChange={handleInputChange}
+    />
               </div>
             </Grid>
             <Grid item xs={6}>
             <div>
                 <Typography variant="subtitle1" gutterBottom>
-                Numéro de téléphone (رقم الهاتف)
+                  
+                Numéro de preuve (الرقم الاستدلالي)
                 </Typography>
                 <TextField
-                //   label="French Label 1"
                   variant="outlined"
                   fullWidth
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">+212</InputAdornment>
-                    ),
-                  }}
-                  // Add necessary props and event handlers
-                />
+                  value={preuveValue}
+                  onChange={handlePreuveInputChange}
+    />
               </div>
             </Grid>
+            
+            
+            
+            <Grid item xs={6}>
+              <div>
+                <Typography variant="subtitle1" gutterBottom>
+                  Date du visa (تاريخ التأشيرة)
+                </Typography>
+                <LocalizationProvider dateAdapter={AdapterDayjs} >
+                <DatePicker 
+                value={selectedDateVisa} // Pass the selectedDate as the value
+                onChange={handleDateVisaChange} // Handle date selection
+                sx={{width:"100%"}}/>
+              </LocalizationProvider>
+              </div>
+            </Grid>
+            <Grid item xs={6}>
+              <div>
+                <Typography variant="subtitle1" gutterBottom>      
+                  Date effective (تاريخ المفعول )
+                </Typography>
+                <LocalizationProvider dateAdapter={AdapterDayjs} >
+                <DatePicker 
+                value={selectedDateEffective} // Pass the selectedDate as the value
+                onChange={handleDateEffectiveChange} // Handle date selection
+                sx={{width:"100%"}}/>
+              </LocalizationProvider>
+              </div>
+            </Grid>
+            
             
           </Grid>
         )}
 
-{activeStep === 1 && (
+
+        {activeStep === 1 && (
           <Grid container spacing={2} style={{marginTop:"2%"}}>
             <Grid item xs={4} >
             <div>
@@ -159,6 +495,8 @@ export default function HorizontalNonLinearStepper() {
                 <Autocomplete
                   id="cadre-autocomplete"
                   options={cadreOptions}
+                  value={selectedCadre}
+                  onChange={handleCadreChange}
                   renderInput={(params) => <TextField {...params} variant="outlined" />}
                 />
               </div>
@@ -172,6 +510,8 @@ export default function HorizontalNonLinearStepper() {
                 <Autocomplete
                   id="cadre-autocomplete"
                   options={cadreOptions}
+                  value={selectedClasse}
+                  onChange={handleClasseChange}
                   renderInput={(params) => <TextField {...params} variant="outlined" />}
                 />
               </div>
@@ -185,14 +525,29 @@ export default function HorizontalNonLinearStepper() {
                 <Autocomplete
                   id="cadre-autocomplete"
                   options={cadreOptions}
+                  value={selectedGrade}
+                  onChange={handleGradeChange}
                   renderInput={(params) => <TextField {...params} variant="outlined" />}
                 />
               </div>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               <div>
                 <Typography variant="subtitle1" gutterBottom>
-                  Email (البريد الإلكتروني)
+                  Date d'entrée dans la fonction publique (ت. و الوظيفة العمومية)
+                </Typography>
+                <LocalizationProvider dateAdapter={AdapterDayjs} >
+                <DatePicker 
+                value={selectedDateFct} // Pass the selectedDate as the value
+                onChange={handleDateFctChange} // Handle date selection
+                sx={{width:"100%"}}/>
+              </LocalizationProvider>
+              </div>
+            </Grid>
+            <Grid item xs={3}>
+              <div>
+                <Typography variant="subtitle1" gutterBottom>
+                  Ancienneté (الـأقدمية)
                 </Typography>
                 <TextField
                 //   label="French Label 3"
@@ -202,37 +557,47 @@ export default function HorizontalNonLinearStepper() {
                 />
               </div>
             </Grid>
-            <Grid item xs={6}>
-            <div>
+            <Grid item xs={4}>
+              <div>
                 <Typography variant="subtitle1" gutterBottom>
-                Numéro de téléphone (رقم الهاتف)
+                  Date d'entrée dans l'établissement (ت.و. المؤسسة)
                 </Typography>
-                <TextField
-                //   label="French Label 1"
-                  variant="outlined"
-                  fullWidth
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">+212</InputAdornment>
-                    ),
-                  }}
-                  // Add necessary props and event handlers
-                />
+                <LocalizationProvider dateAdapter={AdapterDayjs} >
+                <DatePicker 
+                value={selectedDateSchool} // Pass the selectedDate as the value
+                onChange={handleDateSchoolChange} // Handle date selection
+                sx={{width:"100%"}}/>
+              </LocalizationProvider>
               </div>
             </Grid>
+            
             
           </Grid>
         )}
         {allStepsCompleted() ? (
           <React.Fragment>
-            <Typography sx={{ mt: 2, mb: 1 }}>
-              All steps completed - you&apos;re finished
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-              <Box sx={{ flex: '1 1 auto' }} />
-              <Button onClick={handleReset}>Reset</Button>
+            <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Un profile professeur a été ajouté avec succès
+              </Typography>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              un email a été envoyé au professeur pour s'authentifier
+              </Typography>
+              <Button
+              onClick={handleCancelModal}
+              >
+                Cancel
+              </Button>
             </Box>
+          </Modal>
           </React.Fragment>
+          
         ) : (
           <React.Fragment>
             <Typography sx={{ mt: 2, mb: 1, py: 1 }}>

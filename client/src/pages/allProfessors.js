@@ -1,4 +1,4 @@
-import Stepper from '../components/stepper';
+import CustomeTable from '../components/table';
 import Drawer from '../components/drawer';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -7,6 +7,7 @@ export default function home(){
     return(
         <Box sx={{ display: 'flex' }}>
         <Drawer/>
+        
         <Box
   component="main"
   sx={{
@@ -15,12 +16,12 @@ export default function home(){
     marginTop: "8%",
     marginLeft: "5%",
     marginRight: "5%",
-    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Add the boxShadow property
+    // boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Add the boxShadow property
   }}
 >
 <Breadcrumb />
 <>&nbsp;</>
-  <Stepper />
+  <CustomeTable sx={{marginTop:'10%'}}/>
 </Box>
 
       </Box>

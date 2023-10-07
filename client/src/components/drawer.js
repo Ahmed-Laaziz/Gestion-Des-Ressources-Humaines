@@ -19,6 +19,8 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import GroupIcon from '@mui/icons-material/Group';
+import HomeIcon from '@mui/icons-material/Home';
 import { Link } from 'react-router-dom';
 const drawerWidth = 240;
 
@@ -134,6 +136,52 @@ export default function MiniDrawer() {
         <List>
         <ListItem disablePadding sx={{ display: 'block' }}>
       {/* Use the Link component to specify the "to" prop */}
+      <Link to="/home" style={{ textDecoration: 'none' }}>
+        <ListItemButton
+          sx={{
+            minHeight: 48,
+            justifyContent: open ? 'initial' : 'center',
+            px: 2.5,
+          }}
+        >
+          <ListItemIcon
+            sx={{
+              minWidth: 0,
+              mr: open ? 3 : 'auto',
+              justifyContent: 'center',
+            }}
+          >
+            <HomeIcon/>
+          </ListItemIcon>
+          <ListItemText primary="Home" sx={{ opacity: open ? 1 : 0 }} />
+        </ListItemButton>
+      </Link>
+    </ListItem>
+        <ListItem disablePadding sx={{ display: 'block' }}>
+      {/* Use the Link component to specify the "to" prop */}
+      <Link to="/all-professors" style={{ textDecoration: 'none' }}>
+        <ListItemButton
+          sx={{
+            minHeight: 48,
+            justifyContent: open ? 'initial' : 'center',
+            px: 2.5,
+          }}
+        >
+          <ListItemIcon
+            sx={{
+              minWidth: 0,
+              mr: open ? 3 : 'auto',
+              justifyContent: 'center',
+            }}
+          >
+            <GroupIcon/>
+          </ListItemIcon>
+          <ListItemText primary="add professor" sx={{ opacity: open ? 1 : 0 }} />
+        </ListItemButton>
+      </Link>
+    </ListItem>
+    <ListItem disablePadding sx={{ display: 'block' }}>
+      {/* Use the Link component to specify the "to" prop */}
       <Link to="/add-professor" style={{ textDecoration: 'none' }}>
         <ListItemButton
           sx={{
@@ -151,7 +199,7 @@ export default function MiniDrawer() {
           >
             <PersonAddIcon/>
           </ListItemIcon>
-          <ListItemText primary="add professor" sx={{ opacity: open ? 1 : 0 }} />
+          <ListItemText primary="all professors" sx={{ opacity: open ? 1 : 0 }} />
         </ListItemButton>
       </Link>
     </ListItem>
