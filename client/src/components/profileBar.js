@@ -84,10 +84,10 @@ export default function UserCard({ agent }) {
           </Sheet>
           <Box sx={{ display: 'flex', gap: 1.5, '& > button': { flex: 1 } }}>
             <Button variant="outlined" color="neutral">
-              Chat
+              Preiew
             </Button>
             <Button variant="solid" color="primary">
-              Follow
+              Edit
             </Button>
           </Box>
         </CardContent>

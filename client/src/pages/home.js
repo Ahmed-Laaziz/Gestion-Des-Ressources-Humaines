@@ -46,7 +46,6 @@ useEffect(() => {
 //   return <div>Loading...</div>;
 // }
 
-console.log(agent)
   const navigate = useNavigate();
 
     useEffect(() => {
@@ -67,7 +66,10 @@ console.log(agent)
       {token ? (
         // Render content for logged-in users
         <Box sx={{ display: 'flex' }}>
-        <Drawer/>
+          {agent ? (
+            <Drawer role={agent.__t}/>
+          ):null}
+        
         <Box
   component="main"
   sx={{

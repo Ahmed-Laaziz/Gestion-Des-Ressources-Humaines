@@ -6,8 +6,8 @@ async function sendEmail(to, subject, text) {
   const transporter = nodemailer.createTransport({
     service: 'Gmail', // e.g., 'Gmail', 'Yahoo', 'Outlook', etc.
     auth: {
-     // your email address
-      // your email password or app password (for Gmail)
+       // your email address
+       // your email password or app password (for Gmail)
     },
   });
 

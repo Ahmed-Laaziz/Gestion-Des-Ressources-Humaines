@@ -78,9 +78,26 @@ export default function ProfileData({ agent }) {
   </CardActions>
 </CardContent>
 ) : isAdmin ? (
-  <CardContent>
-    {/* Content for Administrator */}
-  </CardContent>
+  <CardContent
+  sx={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(80px, 1fr))',
+    gap: 1.5,
+  }}
+>
+  
+  <FormControl>
+    <FormLabel>Fonction (الوظيفة)</FormLabel>
+    <Input endDecorator={<CreditCardIcon /> } defaultValue={isAdmin ? agent.fonction : 'Loading...'} disabled sx={{fontFamily:'bold'}}/>
+  </FormControl>
+  <FormControl>
+    <FormLabel>Etablissement (المؤسسة)</FormLabel>
+    <Input endDecorator={<CreditCardIcon /> } defaultValue={isAdmin ? 'Ecole nationale des sciences appliquées El Jadida' : 'Loading...'} disabled sx={{fontFamily:'bold'}}/>
+  </FormControl>
+
+
+  
+</CardContent>
 ) : (
   <></>
 )}

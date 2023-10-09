@@ -97,15 +97,20 @@ app.get('/admins', async (req, res) => {
   }
 });
 
+// In your server-side code
+
+
 app.post('/add-professeur', async (req, res) => {
     try {
       const randomPassword = generateRandomPassword(8);
+
+      const userPass = 'HoQhjdslks'
 
       const newProfesseur = new Professeur({
         nom: req.body.nom, 
         prenom: req.body.prenom, 
         email: req.body.email, 
-        password: randomPassword,
+        password: userPass,
         tel: req.body.tel,
         cin: req.body.cin,
         genre: req.body.genre,
@@ -120,9 +125,21 @@ app.post('/add-professeur', async (req, res) => {
       });
   
       const savedProfesseur = await newProfesseur.save();
-      // Send an email to the added professor with their login information
+      
+
+    // Create an entry in the historique
+    const historiqueEntry = new Historique({
+      professeur: savedProfesseur._id, // Associate the historique entry with the new professor
+      grade: req.body.grade, // Set the default grade here
+      classe: req.body.classe, // Set the default class here
+      date: new Date() // Set the current date
+    });
+
+    await historiqueEntry.save();
+
+// Send an email to the added professor with their login information
     const emailSubject = 'Welcome to Our Platform';
-    const emailText = `Dear Professor,\n\nYou have been added to our platform. Your login email is: ${req.body.email}\nYour password is: ${randomPassword}\n\nPlease use these credentials to log in.\n\nBest regards,\nYour Platform Team`;
+    const emailText = `Dear Professor,\n\nYou have been added to our platform. Your login email is: ${req.body.email}\nYour password is: ${userPass}\n\nPlease use these credentials to log in.\n\nBest regards,\nYour Platform Team`;
 
     sendEmail(req.body.email, emailSubject, emailText);
       res.json(savedProfesseur);

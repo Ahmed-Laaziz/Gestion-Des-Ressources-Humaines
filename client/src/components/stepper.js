@@ -14,9 +14,12 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 const steps = ['données personnelles', 'données professionnelles', 'données supplémentaires'];
 const cadreOptions = ['professeur', 'ingénieur'];
+const gradeOptions = ['Grade 1', 'Grade 2'];
+const classeOptions = ['Classe 1', 'Classe 2'];
 const style = {
   position: 'absolute',
   top: '50%',
@@ -306,7 +309,9 @@ const [phoneNumber, setPhoneNumber] = React.useState('');
         num_ref:2121,
         date_effective:selectedDateEffective,
         anciennete:"2 ans",
-        date_visa:selectedDateVisa
+        date_visa:selectedDateVisa,
+        grade:selectedGrade,
+        classe:selectedClasse,
       };
 
       // Make a POST request to your backend API
@@ -509,7 +514,7 @@ const [phoneNumber, setPhoneNumber] = React.useState('');
                 </Typography>
                 <Autocomplete
                   id="cadre-autocomplete"
-                  options={cadreOptions}
+                  options={classeOptions}
                   value={selectedClasse}
                   onChange={handleClasseChange}
                   renderInput={(params) => <TextField {...params} variant="outlined" />}
@@ -524,7 +529,7 @@ const [phoneNumber, setPhoneNumber] = React.useState('');
                 </Typography>
                 <Autocomplete
                   id="cadre-autocomplete"
-                  options={cadreOptions}
+                  options={gradeOptions}
                   value={selectedGrade}
                   onChange={handleGradeChange}
                   renderInput={(params) => <TextField {...params} variant="outlined" />}
@@ -589,11 +594,9 @@ const [phoneNumber, setPhoneNumber] = React.useState('');
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               un email a été envoyé au professeur pour s'authentifier
               </Typography>
-              <Button
-              onClick={handleCancelModal}
-              >
-                Cancel
-              </Button>
+              <Button component={Link} to="/all-professors" variant="contained" sx={{ marginTop: '5%' }}>
+              Cancel
+            </Button>
             </Box>
           </Modal>
           </React.Fragment>

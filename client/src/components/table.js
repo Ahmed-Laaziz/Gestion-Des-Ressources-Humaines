@@ -14,14 +14,43 @@ const columns = [
     field: 'nom',
     headerName: 'Last name',
     width: 150,
-    editable: true,
+    editable: false,
   },
   {
     field: 'cadre',
     headerName: 'Cadre',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
+    // description: 'This column has a value getter and is not sortable.',
+    sortable: true,
+    width: 100,
+  },
+  {
+    field: 'num_loyer',
+    headerName: 'Numéro de loyer',
+    type: 'number',
     width: 160,
+    editable: false,
+  },
+  {
+    field: 'num_ref',
+    headerName: 'Numéro de preuve',
+    type: 'number',
+    width: 160,
+    editable: false,
+
+  },
+  {
+    field: 'date_visa',
+    headerName: 'Date du visa',
+    type: 'Date',
+    width: 160,
+    editable: false,
+  },
+  {
+    field: 'date_effective',
+    headerName: 'Date effective',
+    type: 'Date',
+    width: 160,
+    editable: false,
   },
 ];
 
