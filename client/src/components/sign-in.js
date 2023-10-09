@@ -63,12 +63,13 @@ const [passwordError, setPasswordError] = useState('');
   }
   
     try {
+
       // Send a POST request to the /login endpoint with user credentials
       const response = await axios.post('http://localhost:4000/login', { email, password });
-  
+
       // If authentication is successful, you will receive a JWT token in the response
       const token = response.data.token;
-  
+
       // You can store the token in a cookie or local storage for future authenticated requests
       // For this example, we'll just log the token
       console.log('JWT Token:', token);
