@@ -6,7 +6,7 @@ import Breadcrumb from '../components/breadcrumb';
 export default function home(){
     return(
         <Box sx={{ display: 'flex' }}>
-        <Drawer/>
+        <Drawer role='Admin'/>
         
         <Box
   component="main"

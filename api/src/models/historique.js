@@ -5,7 +5,9 @@ const gradeHistoriqueSchema = new mongoose.Schema({
   grade: String,
   classe: String,
   date: Date,
-});
+}
+, {timestamps: true}
+);
 
 const Historique = mongoose.model('GradeHistorique', gradeHistoriqueSchema);
 

@@ -91,11 +91,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 
 
-export default function MiniDrawer() {
+export default function MiniDrawer({role}) {
 
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-
+  const [userRole, setUserRole] = React.useState(role);
+  console.log(userRole === 'Admin')
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -157,7 +158,9 @@ export default function MiniDrawer() {
         </ListItemButton>
       </Link>
     </ListItem>
-        <ListItem disablePadding sx={{ display: 'block' }}>
+    { userRole === 'Admin' ? (
+  <>
+    <ListItem disablePadding sx={{ display: 'block' }}>
       {/* Use the Link component to specify the "to" prop */}
       <Link to="/all-professors" style={{ textDecoration: 'none' }}>
         <ListItemButton
@@ -180,6 +183,7 @@ export default function MiniDrawer() {
         </ListItemButton>
       </Link>
     </ListItem>
+
     <ListItem disablePadding sx={{ display: 'block' }}>
       {/* Use the Link component to specify the "to" prop */}
       <Link to="/add-professor" style={{ textDecoration: 'none' }}>
@@ -203,6 +207,11 @@ export default function MiniDrawer() {
         </ListItemButton>
       </Link>
     </ListItem>
+  </>
+) : null}
+
+        
+    
           {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
               <ListItemButton
