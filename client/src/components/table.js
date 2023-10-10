@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios'; // Import Axios
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 const columns = [
   {
@@ -19,7 +23,6 @@ const columns = [
   {
     field: 'cadre',
     headerName: 'Cadre',
-    // description: 'This column has a value getter and is not sortable.',
     sortable: true,
     width: 100,
   },
@@ -36,7 +39,6 @@ const columns = [
     type: 'number',
     width: 160,
     editable: false,
-
   },
   {
     field: 'date_visa',
@@ -52,28 +54,83 @@ const columns = [
     width: 160,
     editable: false,
   },
+  {
+    field: 'moreActions',
+    headerName: 'More Actions',
+    sortable: false,
+    width: 120,
+    renderCell: (params) => {
+      return <MoreActionsCell rowParams={params} />;
+    },
+  },
 ];
 
+function MoreActionsCell({ rowParams }) {
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleHistoriqueClick = () => {
+    // Handle "Historique" option click
+    // You can implement the logic here
+    handleMenuClose();
+  };
+
+  const handleProfileClick = () => {
+    // Handle "Profile" option click
+    // You can implement the logic here
+    handleMenuClose();
+  };
+
+  return (
+    <div>
+      <IconButton
+        aria-label="more"
+        aria-controls="more-menu"
+        aria-haspopup="true"
+        onClick={handleMenuOpen}
+      >
+        <MoreVertIcon />
+      </IconButton>
+      <Menu
+        id="more-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleHistoriqueClick}>Historique</MenuItem>
+        <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+      </Menu>
+    </div>
+  );
+}
+
+
 export default function DataGridDemo() {
-  const [professeurs, setProfesseurs] = useState([]); // State to store the fetched data
+  const [professeurs, setProfesseurs] = useState([]);
+  
+  const fetchProfessor = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/prof/professeurs` // Replace with your actual API endpoint
+      );
+      setProfesseurs(response.data);
+    } catch (error) {
+      console.error('Error fetching title:', error);
+    }
+  };
 
   useEffect(() => {
     // Fetch the title from the backend API
-    const fetchProfessor = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:4000/professeurs` // Replace with your actual API endpoint
-        );
-        setProfesseurs(response.data);
-      } catch (error) {
-        console.error('Error fetching title:', error);
-      }
-    };
 
     fetchProfessor(); // Call the fetchTitle function when the component mounts
-  }, ); // Include articleId in the dependency array to fetch when it changes
-
-// Define a function to generate unique IDs for rows
+  }, []);
 
   return (
     <Box sx={{ height: 400, width: '100%' }}>
